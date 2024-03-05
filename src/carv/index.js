@@ -149,22 +149,22 @@ const mintSoul = (wallet, chain_id) => new Promise((resolve, reject) => {
                 resolve({
                     ...response,
                     ...tx,
-                    amount: permit.amount,
                 });
-            } catch (error) {
-                console.error('Error occurred: ', error);
-                reject(error);
+            } catch (e) {
+                const error = e.info.error;
+                resolve({
+                    code: error.code,
+                    msg: error.message,
+                });
             }
         }
     })
-    .catch(error => reject(error));
 });
 
 const randomizeTime = () => {
     const now = new Date();
-    const randomHour = crypto.randomInt(7, 9);
     const randomMinutes = crypto.randomInt(1, 10);
-    const targetTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), randomHour, randomMinutes);
+    const targetTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 7, randomMinutes);
 
     var delay = targetTime.getTime() - now.getTime();
 
@@ -197,6 +197,7 @@ const setDelay = (delay) => {
                 {title: 'Ronin', value: 2020, selected: true},
                 {title: 'opBNB', value: 204},
                 {title: 'Zksync Era', value: 324},
+                {title: 'Linea', value: 59144},
             ],
             min: 1,
             hint: '- Space to select. Return to submit',
@@ -215,16 +216,23 @@ const setDelay = (delay) => {
             await login(wallet);
             
             for (const chain of q.chains) {
-                const provider = new JsonRpcProvider(rpc[chain]);
+                const provider = new JsonRpcProvider(rpc[chain]["url"]);
                 const wallet = new Wallet(account, provider);
 
                 await mintSoul(wallet, chain)
                     .then(async response => {
                         if (response.code !== 0) {
-                            console.log(`[${moment().format("HH:mm:ss")}] ${extractAddressParts(wallet.address)} | Claim Failed, Error ${response.code} - ${response.msg}`);
-                        } else {
-                            const message = `${extractAddressParts(wallet.address)} | Claimed ${response.amount} SOUL`;
+                            const message = `${extractAddressParts(wallet.address)} | Claim Failed, Error ${response.code} - ${response.msg} #${rpc[chain]["name"]}`;
                             console.log(`[${moment().format("HH:mm:ss")}] ${message}`);
+
+                            if (q.useBot) {
+                                await sendMessage(message);
+                            }
+                        } else {
+                            const amount = response.data.permit.amount;
+                            const message = `${extractAddressParts(wallet.address)} | Claimed ${amount} SOUL #${rpc[chain]["name"]}`;
+                            console.log(`[${moment().format("HH:mm:ss")}] ${message}`);
+
                             if (q.useBot) {
                                 await sendMessage(message);
                             }

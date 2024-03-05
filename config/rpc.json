@@ -1,5 +1,18 @@
 {
-    "2020": "https://api.roninchain.com/",
-    "204": "https://opbnb-mainnet-rpc.bnbchain.org",
-    "324": "https://mainnet.era.zksync.io"
-}
+    "2020": {
+        "name": "Ronin",
+        "url": "https://api.roninchain.com/"
+    },
+    "204": {
+        "name": "opBNB",
+        "url": "https://opbnb-mainnet-rpc.bnbchain.org"
+    },
+    "324": {
+        "name": "zkSync",
+        "url": "https://mainnet.era.zksync.io"
+    },
+    "59144": {
+        "name": "Linea",
+        "url": "https://rpc.linea.build/" 
+    }
+  }
