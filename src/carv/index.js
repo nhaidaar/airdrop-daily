@@ -145,11 +145,8 @@ const mintSoul = (wallet, chain_id) => new Promise((resolve, reject) => {
                     value: 0
                 };
 
-                const tx = await wallet.sendTransaction(transaction);
-                resolve({
-                    ...response,
-                    ...tx,
-                });
+                await wallet.sendTransaction(transaction);
+                resolve(response);
             } catch (e) {
                 const error = e.info.error;
                 resolve({
@@ -230,28 +227,29 @@ const setDelay = (delay) => {
                             }
                         } else {
                             const amount = response.data.permit.amount;
+
                             const message = `${extractAddressParts(wallet.address)} | Claimed ${amount} SOUL #${rpc[chain]["name"]}`;
                             console.log(`[${moment().format("HH:mm:ss")}] ${message}`);
-
+                            
                             if (q.useBot) {
                                 await sendMessage(message);
                             }
                         }
                     });
 
-                // Delay 1 min for each chain (except last index)
+                // Delay 30 secs for each chain (except last index)
                 if (q.chains[q.chains.length - 1] !== chain) {
-                    const minutes = 1;
-                    console.log(`DELAY FOR ${minutes} MIN...`);
-                    await setDelay(minutes*60*1000);
+                    const seconds = 30;
+                    console.log(`NEXT CHAIN, DELAY FOR ${seconds} SECS...`);
+                    await setDelay(seconds*1000); 
                 }
             }
 
-            // Delay 5 mins for each account (except last index)
+            // Delay 60 secs for each account (except last index)
             if (listAccounts[listAccounts.length - 1] !== account) {
-                const minutes = 5;
-                console.log(`DELAY FOR ${minutes} MINS...`);
-                await setDelay(5*60*1000); 
+                const seconds = 60;
+                console.log(`NEXT ACCOUNT, DELAY FOR ${seconds} SECS...`);
+                await setDelay(seconds*1000); 
             }
         }
 
