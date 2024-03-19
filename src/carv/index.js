@@ -159,18 +159,9 @@ const mintSoul = (wallet, chain_id) => new Promise((resolve, reject) => {
 });
 
 const randomizeTime = () => {
-    const now = new Date();
-    const randomMinutes = crypto.randomInt(1, 10);
-    const targetTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 7, randomMinutes);
-
-    var delay = targetTime.getTime() - now.getTime();
-
-    // If target time is in the past, delay until tomorrow
-    if (delay <= 0) {
-        // Add one day in milliseconds
-        delay += 24 * 60 * 60 * 1000; 
-    }
-    
+    const tomorrow = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const randomMinutes = crypto.randomInt(1, 5) * 60 * 1000; // minutes in milliseconds
+    const delay = tomorrow + randomMinutes;
     return delay;
 }
 
